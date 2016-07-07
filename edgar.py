@@ -191,9 +191,9 @@ def download_htm():
 
         if text_line.startswith('<FILENAME>'):
             file_name_found = True
-            if text_line.endswith('.pdf\n') or text_line.endswith('.txt\n') or text_line.endswith(
-                    '.htm\n') or text_line.endswith('.xml\n'):
-                htm_file = text_line.split('>')[1].rstrip('\n')
+#            if text_line.endswith('.pdf\n') or text_line.endswith('.txt\n') or text_line.endswith(
+#                    '.htm\n') or text_line.endswith('.xml\n'):
+            htm_file = text_line.split('>')[1].rstrip('\n')
         if text_line.startswith('<DESCRIPTION>') and 'release' in text_line.lower():
             press_release_found = True
 
