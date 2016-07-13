@@ -70,6 +70,7 @@ def main(argv):
 
         if not os.path.isdir(result_dir):
             os.mkdir(result_dir)
+            os.mkdir(os.path.join(result_dir,'XML'))
 
         for t in target:
             if t == '10-K' or t == '10-Q':
@@ -187,13 +188,18 @@ def download_htm():
 
         text_line = text_content.readline()
 
+    xml_check=False
+
     while text_line!='' and not (text_line.startswith('<TEXT>')):
 
         if text_line.startswith('<FILENAME>'):
             file_name_found = True
-#            if text_line.endswith('.pdf\n') or text_line.endswith('.txt\n') or text_line.endswith(
-#                    '.htm\n') or text_line.endswith('.xml\n'):
-            htm_file = text_line.split('>')[1].rstrip('\n')
+            if text_line.endswith('.xml\n'):
+                xml_check=True
+                htm_file = text_line.split('>')[1].rstrip('\n')
+            else:
+                xml_check=False
+                htm_file = text_line.split('>')[1].rstrip('\n')
         if text_line.startswith('<DESCRIPTION>') and 'release' in text_line.lower():
             press_release_found = True
 
@@ -204,7 +210,7 @@ def download_htm():
 
     if htm_file != '':
 
-        print 'Downloading .htm/.txt/.pdf file...\n'
+        print 'Downloading .htm/.txt/.pdf/.xml file...\n'
 
         no_hyphen_text_name = text_name.replace('-', '')
 
@@ -212,33 +218,37 @@ def download_htm():
 
         local_file_part = text_name.split('/')[2] + '--' + text_name.split('/')[3].rstrip('.txt')
 
-        if split_row[2] == '10-K':
-            local_file = os.path.join(os.path.join(result_dir, '10-K'), local_file_part + '--' + htm_file)
-        elif split_row[2] == '10-Q':
-            local_file = os.path.join(os.path.join(result_dir, '10-Q'), local_file_part + '--' + htm_file)
-        elif split_row[2] == '8-K' and press_release_found != True:
-            local_file = os.path.join(os.path.join(result_dir, '8-K'), local_file_part + '--' + htm_file)
-        elif split_row[2] == '8-K' and press_release_found == True:
-            local_file = os.path.join(os.path.join(os.path.join(result_dir, '8-K'), 'Press Release'),
-                                      local_file_part + '--' + htm_file)
-        elif split_row[2] == 'UPLOAD':
-            local_file = os.path.join(os.path.join(os.path.join(result_dir, 'Others'), 'UPLOAD'),
-                                      local_file_part + '--' + htm_file)
-        elif split_row[2] == 'CORRESP':
-            local_file = os.path.join(os.path.join(os.path.join(result_dir, 'Others'), 'CORRESP'),
-                                      local_file_part + '--' + htm_file)
-        elif split_row[2] == 'SC 13G':
-            local_file = os.path.join(os.path.join(os.path.join(result_dir, 'Others'), 'SC 13G'),
-                                      local_file_part + '--' + htm_file)
-        elif split_row[2] == 'SC 13G/A':
-            local_file = os.path.join(os.path.join(os.path.join(result_dir, 'Others'), 'SC 13GA'),
-                                      local_file_part + '--' + htm_file)
-        elif split_row[2] == 'DEF 14A':
-            local_file = os.path.join(os.path.join(os.path.join(result_dir, 'Others'), 'DEF 14A'),
-                                      local_file_part + '--' + htm_file)
-        elif split_row[2] == '10-K405':
-            local_file = os.path.join(os.path.join(os.path.join(result_dir, 'Others'), '10-K405'),
-                                      local_file_part + '--' + htm_file)
+        if xml_check==True:
+            local_file=os.path.join(os.path.join(result_dir,'XML'),local_file_part+'--'+htm_file)
+        else:
+
+            if split_row[2] == '10-K':
+                local_file = os.path.join(os.path.join(result_dir, '10-K'), local_file_part + '--' + htm_file)
+            elif split_row[2] == '10-Q':
+                local_file = os.path.join(os.path.join(result_dir, '10-Q'), local_file_part + '--' + htm_file)
+            elif split_row[2] == '8-K' and press_release_found != True:
+                local_file = os.path.join(os.path.join(result_dir, '8-K'), local_file_part + '--' + htm_file)
+            elif split_row[2] == '8-K' and press_release_found == True:
+                local_file = os.path.join(os.path.join(os.path.join(result_dir, '8-K'), 'Press Release'),
+                                          local_file_part + '--' + htm_file)
+            elif split_row[2] == 'UPLOAD':
+                local_file = os.path.join(os.path.join(os.path.join(result_dir, 'Others'), 'UPLOAD'),
+                                          local_file_part + '--' + htm_file)
+            elif split_row[2] == 'CORRESP':
+                local_file = os.path.join(os.path.join(os.path.join(result_dir, 'Others'), 'CORRESP'),
+                                          local_file_part + '--' + htm_file)
+            elif split_row[2] == 'SC 13G':
+                local_file = os.path.join(os.path.join(os.path.join(result_dir, 'Others'), 'SC 13G'),
+                                          local_file_part + '--' + htm_file)
+            elif split_row[2] == 'SC 13G/A':
+                local_file = os.path.join(os.path.join(os.path.join(result_dir, 'Others'), 'SC 13GA'),
+                                          local_file_part + '--' + htm_file)
+            elif split_row[2] == 'DEF 14A':
+                local_file = os.path.join(os.path.join(os.path.join(result_dir, 'Others'), 'DEF 14A'),
+                                          local_file_part + '--' + htm_file)
+            elif split_row[2] == '10-K405':
+                local_file = os.path.join(os.path.join(os.path.join(result_dir, 'Others'), '10-K405'),
+                                          local_file_part + '--' + htm_file)
 
         try:
             htm_content = urlopen(new_url)
